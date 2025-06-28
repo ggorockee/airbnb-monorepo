@@ -407,3 +407,5 @@ pyrightconfig.json
 
 .idea
 */migrations/0*.py
+0*.py
+text

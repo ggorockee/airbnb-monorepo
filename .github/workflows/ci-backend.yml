@@ -1,0 +1,49 @@
+# .github/workflows/ci-backend.yml
+
+name: CI - Django Backend
+
+# 워크플로우 실행 조건 정의
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 푸시될 때 실행
+    paths:
+      - 'backend/**'  # backend/ 디렉토리 하위에 변경이 있을 때만 실행
+      - '.github/workflows/ci-backend.yml' # 워크플로우 파일 자체가 변경될 때도 실행
+
+jobs:
+  # 첫 번째 Job: Docker 이미지를 빌드하고 푸시하는 작업
+  build-and-push-image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest # 실행 환경 지정
+
+    # 이 Job의 결과물(output)을 다른 Job에서 사용할 수 있도록 설정
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tag }} # 생성된 이미지 태그를 output으로 지정
+
+    steps:
+      # 1. 소스 코드 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Docker Hub 로그인 (GitHub Secrets 사용)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. 이미지 태그 생성 (날짜 + Git 커밋 해시 조합)
+      - name: Generate image tag
+        id: meta
+        run: |
+          TAG=$(date +%Y%m%d)-$(git rev-parse --short HEAD)
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      # 4. Docker 이미지 빌드 및 푸시
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend  # Dockerfile이 있는 디렉토리
+          push: true  # 빌드 후 푸시 실행
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/py-airbnb-backend:${{ steps.meta.outputs.tag }}
