@@ -409,3 +409,4 @@ pyrightconfig.json
 */migrations/0*.py
 0*.py
 text
+backend/database
