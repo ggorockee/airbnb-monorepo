@@ -2,7 +2,7 @@
 
 # ----------------- STAGE 1: 빌드 환경 (Builder) -----------------
 # Node.js 18-alpine 이미지를 빌드 환경으로 사용합니다. 'alpine' 버전은 가벼움
-FROM node:lts-alpine3.21 as builder
+FROM node:lts-alpine3.21 AS builder
 
 # 컨테이너 내의 작업 디렉토리를 설정합니다.
 WORKDIR /app
