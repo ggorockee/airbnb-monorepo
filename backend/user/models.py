@@ -119,6 +119,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         choices=CurrencyChoices.choices,
     )
 
+    avatar = models.URLField(blank=True)
+
     created_at = models.DateTimeField(
         _("create at"),
         auto_now_add=True,

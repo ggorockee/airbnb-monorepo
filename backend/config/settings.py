@@ -226,14 +226,30 @@ SIMPLE_JWT = {
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
 }
 
+KAKAO_CLIENT_ID = os.getenv("KAKAO_CLIENT_ID")
+
 
 APPEND_SLASH = False
+CORS_ALLOW_CREDENTIALS = True
 
 if DEBUG:
-    CORS_ORIGIN_ALLOW_ALL = True
-else:
-    CORS_ORIGIN_ALLOW_ALL = False
+    # 개발 환경에서는 localhost:3000만 허용
     CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+    ]
+else:
+    # 프로덕션 환경에서는 실제 서비스 도메인만 허용
+    CORS_ALLOWED_ORIGINS = [
+        "http://airbnb-beta.ggorockee.com",
+        "http://airbnb.ggorockee.com",
+    ]
+
+# --- CSRF Settings ---
+# CORS 설정과 마찬가지로, 환경에 따라 신뢰하는 출처를 분리하여 관리합니다.
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+else:
+    CSRF_TRUSTED_ORIGINS = [
         "http://airbnb-beta.ggorockee.com",
         "http://airbnb.ggorockee.com",
     ]

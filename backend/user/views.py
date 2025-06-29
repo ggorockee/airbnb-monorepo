@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, get_user_model, logout, login
 from django.shortcuts import get_object_or_404
-
+import requests
+from django.conf import settings
 
 from rest_framework.exceptions import (
     AuthenticationFailed,
@@ -224,3 +225,59 @@ class Users(APIView):
             serializer.data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class KakaoLogIn(APIView):
+
+    redirect_url = (
+        "http://localhost:3000/social/kakao"
+        if settings.DEBUG
+        else "http://airbnb-beta.ggorockee.com/social/kakao"
+    )
+
+    def post(self, request):
+        try:
+            code = request.data.get("code")
+            access_token = requests.post(
+                "https://kauth.kakao.com/oauth/token",
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                data={
+                    "grant_type": "authorization_code",
+                    "client_id": settings.KAKAO_CLIENT_ID,
+                    "redirect_uri": self.redirect_url,
+                    "code": code,
+                },
+            )
+
+            access_token = access_token.json().get("access_token")
+            user_data = requests.get(
+                "https://kapi.kakao.com/v2/user/me",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+                },
+            )
+
+            user_data = user_data.json()
+            kakao_account = user_data.get("kakao_account")
+            profile = kakao_account.get("profile")
+
+            try:
+                user = get_user_model().objects.get(email=kakao_account.get("email"))
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+            except get_user_model().DoesNotExist:
+                user = get_user_model().objects.create(
+                    email=kakao_account.get("email"),
+                    username=profile.get("nickname"),
+                    avatar=profile.get("profile_image_url"),
+                )
+                user.set_unusable_password()
+                user.save()
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},  # 에러 메시지를 프론트에도 전달
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,  # 400보다는 500이 더 적합
+            )

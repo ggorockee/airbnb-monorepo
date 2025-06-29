@@ -39,6 +39,8 @@ class RoomAdmin(admin.ModelAdmin):
         "=owner__username",
     )
 
+    # exclude = ("owner",)
+
 
 @admin.register(Amenity)
 class AmenityAdmin(admin.ModelAdmin):
