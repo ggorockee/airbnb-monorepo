@@ -1,0 +1,24 @@
+{{- if and .Values.ingress.enabled (eq .Values.ingress.className "istio") }}
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "frontend.fullname" . }}
+  labels:
+    {{- include "frontend.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- toYaml .Values.gateway.selector | nindent 4 }}
+  servers:
+  - port:
+      number: {{ .Values.gateway.port.number }}
+      name: {{ .Values.gateway.port.name }}
+      protocol: {{ .Values.gateway.port.protocol }}
+    hosts:
+      {{- range .Values.ingress.hosts }}
+      - {{ . }}
+      {{- end }}
+    {{- with .Values.gateway.tls }}
+    tls:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+{{- end }}
