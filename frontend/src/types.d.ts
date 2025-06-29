@@ -50,3 +50,15 @@ export interface IReview {
 	rating: number;
 	user: IRoomOwner;
 }
+
+export interface UseUserResult {
+	userLoading: boolean;
+	user?: IUser;
+	isLoggedIn: boolean;
+}
+
+export interface IUser {
+	pk: number;        // 유저 고유 식별자
+	username: string;  // 로그인 ID
+	email: string;     // 이메일
+}
