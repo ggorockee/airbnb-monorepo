@@ -1,5 +1,6 @@
-import { Box, Grid, HStack, Skeleton, SkeletonText } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Grid } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
+import { getRooms } from "../api";
 import Room from "../components/Room";
 import RoomSkeleton from "../components/RoomSkeleton";
 
@@ -9,7 +10,7 @@ interface IPhoto {
 	description: string;
 }
 
-interface IRoom {
+export interface IRoom {
 	pk: number;
 	name: string;
 	country: string;
@@ -21,17 +22,16 @@ interface IRoom {
 }
 
 export default function Home() {
-	const [isLoading, setIsLoading] = useState(true);
-	const [rooms, setRooms] = useState<IRoom[]>([]);
-	const fetchRooms = async () => {
-		const response = await fetch("http://127.0.0.1:8000/api/v1/rooms/");
-		const json = await response.json();
-		setRooms(json);
-		setIsLoading(false);
-	};
-	useEffect(() => {
-		fetchRooms();
-	}, []);
+	const {
+		isLoading,
+		data: rooms = [],
+		error,
+	} = useQuery<IRoom[], Error>({
+		queryKey: ["rooms"],
+		queryFn: getRooms,
+	});
+	if (error) return <p>에러 발생: {error.message}</p>;
+
 	return (
 		<Grid
 			mt={10}
@@ -49,30 +49,20 @@ export default function Home() {
 				"2xl": "repeat(5, 1fr)",
 			}}
 		>
-			{isLoading ? (
-				<>
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-					<RoomSkeleton />
-				</>
-			) : null}
-			{rooms.map((room) => (
-				<Room
-					imageUrl={room.photos[0].file}
-					name={room.name}
-					rating={room.rating}
-					city={room.city}
-					country={room.country}
-					price={room.price}
-				/>
-			))}
+			{isLoading
+				? Array.from({ length: 10 }).map((_, i) => <RoomSkeleton key={i} />)
+				: rooms.map((room) => (
+					<Room
+						key={room.pk}
+						pk={room.pk}
+						imageUrl={room.photos[0].file}
+						name={room.name}
+						rating={room.rating}
+						city={room.city}
+						country={room.country}
+						price={room.price}
+					/>
+				))}
 		</Grid>
 	);
 }
