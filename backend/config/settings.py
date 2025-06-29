@@ -1,7 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
-
 import os
 
 load_dotenv()
@@ -24,7 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = os.getenv("DEBUG", "off").lower() in ("true", "on", "1", "yes")
+
 
 ALLOWED_HOSTS_STRING = os.getenv("DJANGO_ALLOWED_HOSTS")
 if DEBUG:

@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  # 'name' 대신 'generateName'을 사용합니다.
+  # 마지막에 하이픈(-)을 붙여주는 것이 좋습니다.
+  generateName: django-migrate-job-
+spec:
+  template:
+    spec:
+      containers:
+      - name: django-migrate
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        command: ["python", "manage.py", "migrate"]
+        envFrom:
+          - secretRef:
+              name: django-secrets
+          - configMapRef:
+              name: django-config
+      restartPolicy: Never
+  ttlSecondsAfterFinished: 100
+  backoffLimit: 4

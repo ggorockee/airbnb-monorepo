@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-config
+  namespace: airbnb-dev
+data:
+  DUMMY_VALUE: "1"
