@@ -2,7 +2,7 @@
 
 # ----------------- STAGE 1: 빌드 환경 (Builder) -----------------
 # Node.js 18-alpine 이미지를 빌드 환경으로 사용합니다. 'alpine' 버전은 가벼움
-FROM node:18-alpine as builder
+FROM node:lts-alpine3.21 as builder
 
 # 컨테이너 내의 작업 디렉토리를 설정합니다.
 WORKDIR /app
@@ -24,7 +24,7 @@ RUN npm run build
 
 # ----------------- STAGE 2: 프로덕션 환경 (Production) -----------------
 # 경량 Nginx 이미지를 최종 배포 환경으로 사용
-FROM nginx:stable-alpine
+FROM nginx:stable-alpine3.21
 
 # 위 'builder' 단계의 /app/build 디렉토리에서 생성된 결과물 전체를
 # Nginx의 기본 정적 파일 제공 디렉토리로 복사
