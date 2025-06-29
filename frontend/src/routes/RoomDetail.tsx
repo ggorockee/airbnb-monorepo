@@ -85,7 +85,7 @@ export default function RoomDetail() {
 								objectFit="cover"
 								w="100%"
 								h="100%"
-								src={roomData?.photos[index]?.file}
+								src={"roomData?.photos[index]?.file"}
 							/>
 						</Skeleton>
 					</GridItem>

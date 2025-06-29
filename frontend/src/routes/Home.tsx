@@ -2,7 +2,7 @@ import { Grid } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { getRooms } from "../api";
 import Room from "../components/Room";
-import RoomSkeleton from "../components/RoomSkeleton";
+// import RoomSkeleton from "../components/RoomSkeleton";
 import { IRoomList } from "../types";
 
 export default function Home() {
@@ -36,24 +36,37 @@ export default function Home() {
 				"2xl": "repeat(5, 1fr)",
 			}}
 		>
-			{isLoading ? (
-				// skeleton 개수만큼 보여주기
-				Array.from({ length: 10 }).map((_, i) => <RoomSkeleton key={i} />)
-			) : (
-				// rooms는 항상 IRoomList[] 이므로 map 사용 가능
-				rooms.map((room) => (
-					<Room
-						key={room.pk}
-						pk={room.pk}
-						imageUrl={room.photos[0].file}
-						name={room.name}
-						rating={room.rating}
-						city={room.city}
-						country={room.country}
-						price={room.price}
-					/>
-				))
-			)}
+			{/*{isLoading ? (*/}
+			{/*	// skeleton 개수만큼 보여주기*/}
+			{/*	Array.from({ length: 10 }).map((_, i) => <RoomSkeleton key={i} />)*/}
+			{/*) :  (*/}
+			{/*	// rooms는 항상 IRoomList[] 이므로 map 사용 가능*/}
+			{/*	rooms.map((room) => (*/}
+			{/*		<Room*/}
+			{/*			key={room.pk}*/}
+			{/*			pk={room.pk}*/}
+			{/*			imageUrl={room.photos[0].file}*/}
+			{/*			name={room.name}*/}
+			{/*			rating={room.rating}*/}
+			{/*			city={room.city}*/}
+			{/*			country={room.country}*/}
+			{/*			price={room.price}*/}
+			{/*		/>*/}
+			{/*	))*/}
+			{/*)}*/}
+			{rooms.map((room) => (
+				<Room
+					key={room.pk}
+					pk={room.pk}
+					// imageUrl={room.photos[0].file}
+					name={room.name}
+					rating={room.rating}
+					city={room.city}
+					country={room.country}
+					price={room.price}
+				/>
+			))}
+
 		</Grid>
 	);
 }

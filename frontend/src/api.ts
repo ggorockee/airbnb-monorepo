@@ -38,13 +38,26 @@ export const getRoomReviews = ({ queryKey }: QueryFunctionContext) => {
 };
 
 export const getMe = () =>
-	instance.get(`user/me`).then((response) => response.data);
+	instance.get(`/auth/me`).then((response) => response.data);
 
 export const logOut = () =>
 	instance
-		.post(`user/logout`, null, {
+		.post(`/auth/logout`, null, {
 			headers: {
 				"X-CSRFToken": Cookie.get("csrftoken") || "",
 			},
 		})
 		.then((response) => response.data);
+
+export const kakaoLogin = (code: string) =>
+	instance
+		.post(
+			`/auth/kakao`,
+			{ code },
+			{
+				headers: {
+					"X-CSRFToken": Cookie.get("csrftoken") || "",
+				},
+			}
+		)
+		.then((response) => response.status);
