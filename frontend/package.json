@@ -14,6 +14,7 @@
     "@types/node": "^16.11.59",
     "axios": "^1.10.0",
     "framer-motion": "^7.10.3",
+    "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.4.0",
@@ -46,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "typescript": "^4.9.5"
