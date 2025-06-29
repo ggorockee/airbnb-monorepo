@@ -1,10 +1,27 @@
+# 수정 후 코드 (Helm Hook 적용)
 apiVersion: batch/v1
 kind: Job
 metadata:
-  # 'name' 대신 'generateName'을 사용합니다.
-  # 마지막에 하이픈(-)을 붙여주는 것이 좋습니다.
-  generateName: django-migrate-job-
+  # 1. 랜덤 값을 제거하고 릴리스마다 고유하고 예측 가능한 이름으로 변경
+  name: {{ .Release.Name }}-django-migrate
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+  annotations:
+    # 2. 이 리소스를 Helm Hook으로 지정
+    # 'helm install'과 'helm upgrade'가 실행되기 "전"에 이 Job을 실행
+    "helm.sh/hook": "pre-install,pre-upgrade"
+
+    # 3. Hook 작업이 성공적으로 완료되면 이 Job 리소스를 자동으로 삭제
+    # 불필요하게 완료된 Job이 클러스터에 쌓이는 것을 방지하는 가장 좋은 방법
+    "helm.sh/hook-delete-policy": "hook-succeeded"
+
+    # 4. (선택사항) 다른 Hook과의 실행 순서를 정합니다. 숫자가 낮을수록 먼저 실행
+    "helm.sh/hook-weight": "-5"
 spec:
+  # Job이 완료(성공 또는 최종 실패)된 후 120초가 지나면 Kubernetes가 Job을 삭제합니다.
+  # hook-delete-policy가 있어 필수는 아니지만, 실패한 Hook Job을 정리하는 데 도움이 됩니다.
+  ttlSecondsAfterFinished: 120
+  backoffLimit: 4 # Job 실패 시 재시도 횟수
   template:
     spec:
       containers:
@@ -12,10 +29,9 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         command: ["python", "manage.py", "migrate"]
         envFrom:
+          # 5. Secret과 ConfigMap 이름도 릴리스에 따라 동적으로 설정하는 것이 좋습니다.
           - secretRef:
               name: django-secrets
           - configMapRef:
               name: django-config
       restartPolicy: Never
-  ttlSecondsAfterFinished: 100
-  backoffLimit: 4

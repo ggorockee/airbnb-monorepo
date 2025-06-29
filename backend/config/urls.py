@@ -7,8 +7,11 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from . import views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    re_path(r"^healthz/ready/?$", views.Healthcheck.as_view()),
     path("api/v1/room/", include("room.urls")),
     path("api/v1/category/", include("category.urls")),
     path("api/v1/experience/", include("experience.urls")),

@@ -1,0 +1,28 @@
+# templates/istio-virtualservice.yaml
+{{- if and .Values.ingress.enabled (eq .Values.ingress.className "istio") }}
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ include "backend.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  hosts:
+  {{- range .Values.ingress.hosts }}
+    - {{ . }}
+  {{- end }}
+  gateways:
+    - {{ include "backend.fullname" . }}
+  http:
+  - match:
+    - uri:
+        prefix: /
+    corsPolicy:
+      {{- toYaml .Values.virtualservice.corsPolicy | nindent 6 }}
+    route:
+    - destination:
+        host: {{ include "backend.fullname" . }}
+        port:
+          {{- /* 라우팅 대상 포트는 values.yaml에서 정의한 값을 사용합니다. */}}
+          number: {{ .Values.service.port }}
+{{- end }}

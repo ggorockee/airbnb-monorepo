@@ -43,21 +43,7 @@ service:
   type: ClusterIP
   port: 80
 
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -106,3 +92,57 @@ tolerations: []
 
 affinity: {}
 existingSecret: django-secrets
+
+ingress:
+  enabled: true
+  className: "istio"
+  annotations: {}
+  hosts:
+    - chart-example.local
+      
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+gateway:
+  # Gateway가 트래픽을 받을 포트 설정
+  port:
+    number: 80
+    name: http
+    protocol: HTTP
+
+  # Ingress Gateway Pod를 선택하기 위한 셀렉터
+  # 기본값은 Istio 설치 시 기본적으로 사용되는 레이블입니다.
+  selector:
+    istio: ingressgateway
+
+  tls:
+    httpsRedirect: false
+
+# Istio VirtualService 리소스에 대한 상세 설정
+virtualservice:
+  # CORS 정책 설정
+  corsPolicy:
+    allowOrigins:
+      - regex: "https?://.*"
+    allowMethods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+      - "PATCH"
+    allowHeaders:
+      - "*"
+    exposeHeaders:
+      - "*"
+    allowCredentials: true
+
+  # 트래픽을 라우팅할 대상(destination) 서비스 설정
+  # route:
+    # host: Helm 차트 내에서 생성된 서비스 이름을 동적으로 참조합니다.
+    #       (별도의 서비스 이름이 필요하면 여기에 직접 지정할 수 있습니다.)
+    # port: 차트의 service.port 값을 사용합니다.
+    # port:
+    #   number: 9200 # service.port와 동일하게 설정 (또는 원하는 값으로 변경)
