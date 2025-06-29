@@ -47,6 +47,7 @@ SYSTEM_APPS = [
 THIRD_PART_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
+    "corsheaders",
 ]
 
 CUSTOM_APPS = [
@@ -65,6 +66,7 @@ CUSTOM_APPS = [
 INSTALLED_APPS = SYSTEM_APPS + THIRD_PART_APPS + CUSTOM_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -97,24 +99,34 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if DEBUG:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+# if DEBUG:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": BASE_DIR / "db.sqlite3",
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.postgresql",
+#             "NAME": os.getenv("POSTGRES_DB"),
+#             "USER": os.getenv("POSTGRES_USER"),
+#             "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+#             "HOST": os.getenv("POSTGRES_HOST"),
+#             "PORT": os.getenv("POSTGRES_PORT", "5432"),  # 기본 포트 5432
+#         }
+#     }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("POSTGRES_HOST"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),  # 기본 포트 5432
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("POSTGRES_DB"),
-            "USER": os.getenv("POSTGRES_USER"),
-            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-            "HOST": os.getenv("POSTGRES_HOST"),
-            "PORT": os.getenv("POSTGRES_PORT", "5432"),  # 기본 포트 5432
-        }
-    }
+}
 
 
 # Password validation
@@ -216,3 +228,12 @@ SIMPLE_JWT = {
 
 
 APPEND_SLASH = False
+
+if DEBUG:
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ALLOWED_ORIGINS = [
+        "http://airbnb-beta.ggorockee.com",
+        "http://airbnb.ggorockee.com",
+    ]
