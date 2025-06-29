@@ -408,3 +408,5 @@ pyrightconfig.json
 .idea
 text
 backend/database
+frontend/.vscode
+*.tgz
