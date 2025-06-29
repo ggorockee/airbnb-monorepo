@@ -61,4 +61,12 @@ export interface IUser {
 	pk: number;        // 유저 고유 식별자
 	username: string;  // 로그인 ID
 	email: string;     // 이메일
+	avatar: string;
+	is_host: boolean;
+	gender: string;
+	language: string;
+	currency: string;
+	created_at: string;
+	updated_at: string;
+
 }

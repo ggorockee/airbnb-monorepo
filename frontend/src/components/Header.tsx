@@ -14,7 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
-import useUser from "../lib/userUser"
+import useUser from "../lib/useUser";
 
 export default function Header() {
 	const { userLoading, isLoggedIn, user } = useUser();
@@ -70,7 +70,7 @@ export default function Header() {
 							</LightMode>
 						</>
 					) : (
-						<Avatar size={"md"} />
+						<Avatar name={user?.username} src={user?.avatar} size={"md"} />
 					)
 				) : null}
 			</HStack>

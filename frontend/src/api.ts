@@ -14,7 +14,10 @@ const baseURL = debug
 	: "http://airbnb-umbrella-dev-backend.airbnb-dev.svc.cluster.local:8000/api/v1/";
 
 
-export const instance = axios.create({ baseURL });
+export const instance = axios.create({
+	baseURL,
+	withCredentials: true,
+});
 
 
 export const getRooms = () =>
