@@ -26,6 +26,11 @@ export interface IAmenity {
 	description: string;
 }
 
+export interface IForm {
+	email: string;
+	password: string;
+}
+
 export interface IRoomDetail extends IRoomList {
 	created_at: string;
 	updated_at: string;

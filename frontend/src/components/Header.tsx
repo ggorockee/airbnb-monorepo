@@ -15,13 +15,15 @@ import {
 	useColorModeValue,
 	useDisclosure,
 	useToast,
+	ToastId,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
 import useUser from "../lib/useUser";
 import { logOut } from "../api";
-import { useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Header() {
 	const { userLoading, isLoggedIn, user } = useUser();
@@ -40,20 +42,36 @@ export default function Header() {
 	const Icon = useColorModeValue(FaMoon, FaSun);
 	const toast = useToast();
 	const queryClient = useQueryClient();
+	const toastId = useRef<ToastId>();
+	const mutation = useMutation({
+		// Assign the logOut function to the mutationFn property
+		mutationFn: logOut,
+
+		onMutate: () => {
+			toastId.current = toast({
+				title: "Logging out...",
+				description: "Sad to see you go...",
+				status: "loading",
+				position: "bottom-right",
+			});
+		},
+		onSuccess: () => {
+			if (toastId.current) {
+				// It's good practice to use the object syntax for refetchQueries in v5
+				queryClient.refetchQueries({ queryKey: ["me"] });
+				toast.update(toastId.current, {
+					status: "success",
+					title: "Done!",
+					description: "See you later!",
+				});
+			}
+		},
+	});
+
+
+
 	const onLogOut = async () => {
-		const toastId = toast({
-			title: "Login out...",
-			description: "Sad to see you go...",
-			status: "loading",
-			position: "bottom-right",
-		});
-		await logOut();
-		queryClient.refetchQueries({ queryKey: ["me"] });
-		toast.update(toastId, {
-			status: "success",
-			title: "Done!",
-			description: "See you later!",
-		});
+		mutation.mutate();
 	};
 	return (
 		<Stack

@@ -61,3 +61,32 @@ export const kakaoLogin = (code: string) =>
 			}
 		)
 		.then((response) => response.status);
+
+export interface IEmailLoginVariables {
+	email: string;
+	password: string;
+}
+export interface IEmailLoginSuccess {
+	ok: string;
+}
+export interface IEmailLoginError {
+	error: string;
+	message?: string;
+	[key: string]: any;
+}
+
+export const emailLogIn = ({
+	                              email,
+	                              password,
+                              }: IEmailLoginVariables) =>
+	instance
+		.post(
+			`/auth/login`,
+			{ email, password },
+			{
+				headers: {
+					"X-CSRFToken": Cookie.get("csrftoken") || "",
+				},
+			}
+		)
+		.then((response) => response.data);

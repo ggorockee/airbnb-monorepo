@@ -2,15 +2,11 @@ import { Grid } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { getRooms } from "../api";
 import Room from "../components/Room";
-// import RoomSkeleton from "../components/RoomSkeleton";
 import { IRoomList } from "../types";
 
 export default function Home() {
-	// 1) 제네릭을 <데이터타입, 에러타입> 으로 지정
-	// 2) 객체 옵션 형태로 queryKey, queryFn을 명시
-	// 3) data를 바로 rooms로 받고 기본값을 빈 배열([])로 설정
 	const {
-		isLoading,
+		// isLoading은 더 이상 사용하지 않으므로 제거해도 됩니다.
 		data: rooms = [],
 		error,
 	} = useQuery<IRoomList[], Error>({
@@ -36,24 +32,11 @@ export default function Home() {
 				"2xl": "repeat(5, 1fr)",
 			}}
 		>
-			{/*{isLoading ? (*/}
-			{/*	// skeleton 개수만큼 보여주기*/}
-			{/*	Array.from({ length: 10 }).map((_, i) => <RoomSkeleton key={i} />)*/}
-			{/*) :  (*/}
-			{/*	// rooms는 항상 IRoomList[] 이므로 map 사용 가능*/}
-			{/*	rooms.map((room) => (*/}
-			{/*		<Room*/}
-			{/*			key={room.pk}*/}
-			{/*			pk={room.pk}*/}
-			{/*			imageUrl={room.photos[0].file}*/}
-			{/*			name={room.name}*/}
-			{/*			rating={room.rating}*/}
-			{/*			city={room.city}*/}
-			{/*			country={room.country}*/}
-			{/*			price={room.price}*/}
-			{/*		/>*/}
-			{/*	))*/}
-			{/*)}*/}
+			{/*
+      데이터 로딩(isLoading) 상태와 관계없이
+      rooms 데이터가 있을 때만 Room 컴포넌트를 렌더링합니다.
+      초기값으로 빈 배열([])이 설정되어 있어 오류가 발생하지 않습니다.
+    */}
 			{rooms.map((room) => (
 				<Room
 					key={room.pk}
@@ -66,7 +49,6 @@ export default function Home() {
 					price={room.price}
 				/>
 			))}
-
 		</Grid>
 	);
 }
