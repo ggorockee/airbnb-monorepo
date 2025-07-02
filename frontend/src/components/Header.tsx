@@ -11,19 +11,19 @@ import {
 	MenuItem,
 	MenuList,
 	Stack,
+	ToastId,
 	useColorMode,
 	useColorModeValue,
 	useDisclosure,
 	useToast,
-	ToastId,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
 import useUser from "../lib/useUser";
 import { logOut } from "../api";
-import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 
 export default function Header() {
 	const { userLoading, isLoggedIn, user } = useUser();
@@ -52,6 +52,7 @@ export default function Header() {
 				title: "Logging out...",
 				description: "Sad to see you go...",
 				status: "loading",
+				duration: 10000,
 				position: "bottom-right",
 			});
 		},
@@ -67,9 +68,6 @@ export default function Header() {
 			}
 		},
 	});
-
-
-
 	const onLogOut = async () => {
 		mutation.mutate();
 	};
@@ -117,6 +115,11 @@ export default function Header() {
 								<Avatar name={user?.username} src={user?.avatar} size={"md"} />
 							</MenuButton>
 							<MenuList>
+								{user?.is_host ? (
+									<Link to="/rooms/upload">
+										<MenuItem>Upload room</MenuItem>
+									</Link>
+								) : null}
 								<MenuItem onClick={onLogOut}>Log out</MenuItem>
 							</MenuList>
 						</Menu>

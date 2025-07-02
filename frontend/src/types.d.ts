@@ -1,6 +1,6 @@
 export interface IRoomPhotoPhoto {
 	pk: string;
-	// file: string;
+	file: string;
 	description: string;
 }
 
@@ -15,23 +15,32 @@ export interface IRoomList {
 	photos: IRoomPhotoPhoto[];
 }
 
-export interface IRoomOwner {
-	name: string;
-	avatar: string;
-	username: string;
-}
-
-export interface IAmenity {
-	name: string;
-	description: string;
-}
-
 export interface IForm {
 	email: string;
 	password: string;
 }
 
+export interface IRoomOwner {
+	name: string;
+	avatar: string;
+	username: string;
+	email: string;
+}
+
+export interface IAmenity {
+	pk: number;
+	name: string;
+	description: string;
+}
+
+export interface ICategory {
+	pk: number;
+	name: string;
+	kind: string;
+}
+
 export interface IRoomDetail extends IRoomList {
+	id: number;
 	created_at: string;
 	updated_at: string;
 	rooms: number;
@@ -42,18 +51,27 @@ export interface IRoomDetail extends IRoomList {
 	kind: string;
 	is_owner: boolean;
 	is_liked: boolean;
-	category: {
-		name: string;
-		kind: string;
-	};
+	category: ICategory;
 	owner: IRoomOwner;
 	amenities: IAmenity[];
 }
+
 
 export interface IReview {
 	payload: string;
 	rating: number;
 	user: IRoomOwner;
+}
+
+export interface IUser {
+	pk: number;
+	email: string;
+	username: string;
+	avatar: string;
+	is_host: boolean;
+	gender: string;
+	language: string;
+	currency: string;
 }
 
 export interface UseUserResult {
@@ -62,16 +80,7 @@ export interface UseUserResult {
 	isLoggedIn: boolean;
 }
 
-export interface IUser {
-	pk: number;        // 유저 고유 식별자
-	username: string;  // 로그인 ID
-	email: string;     // 이메일
-	avatar: string;
-	is_host: boolean;
-	gender: string;
-	language: string;
-	currency: string;
-	created_at: string;
-	updated_at: string;
-
+export interface ICheckBookingResponse {
+	ok: boolean;
 }
+
