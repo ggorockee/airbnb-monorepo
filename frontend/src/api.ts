@@ -12,7 +12,7 @@ const debug =
 
 const baseURL = debug
 	? "http://localhost:8000/api/v1/"
-	: "http://airbnb-umbrella-dev-backend.airbnb-dev.svc.cluster.local:8000/api/v1/";
+	: "http://airbnb-umbrella-backend.airbnb-dev.svc.cluster.local:8000/api/v1/";
 
 
 export const instance = axios.create({
