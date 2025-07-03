@@ -4,17 +4,16 @@ import os
 import environ
 
 
-
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
-    DJANGO_ALLOWED_HOSTS=(str, "")
+    DJANGO_ALLOWED_HOSTS=(str, ""),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,15 +23,14 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = env("DEBUG")
 
-print("DEBUG:", DEBUG)
+
 ALLOWED_HOSTS_STRING = env("DJANGO_ALLOWED_HOSTS")
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
     ALLOWED_HOSTS = ALLOWED_HOSTS_STRING.split(",")
-print(f"ALLOWED_HOSTS: ==> {ALLOWED_HOSTS}")
 
 
 # Application definition
@@ -69,6 +67,7 @@ INSTALLED_APPS = SYSTEM_APPS + THIRD_PART_APPS + CUSTOM_APPS
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
+    # "common.middleware.AccessLogMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -234,24 +233,115 @@ KAKAO_CLIENT_ID = env("KAKAO_CLIENT_ID")
 APPEND_SLASH = False
 CORS_ALLOW_CREDENTIALS = True
 
-if DEBUG:
-    # 개발 환경에서는 localhost:3000만 허용
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
-    ]
-else:
-    # 프로덕션 환경에서는 실제 서비스 도메인만 허용
-    CORS_ALLOWED_ORIGINS = [
-        "http://airbnb-beta.ggorockee.com",
-        "http://airbnb.ggorockee.com",
-    ]
+# if DEBUG:
+#     # 개발 환경에서는 localhost:3000만 허용
+#     CORS_ALLOWED_ORIGINS = [
+#         "http://localhost:3000",
+#     ]
+# else:
+#     # 프로덕션 환경에서는 실제 서비스 도메인만 허용
+#     CORS_ALLOWED_ORIGINS = [
+#         "http://airbnb-beta.ggorockee.com",
+#         "http://airbnb.ggorockee.com",
+#     ]
 
-# --- CSRF Settings ---
-# CORS 설정과 마찬가지로, 환경에 따라 신뢰하는 출처를 분리하여 관리합니다.
-if DEBUG:
-    CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
-else:
-    CSRF_TRUSTED_ORIGINS = [
-        "http://airbnb-beta.ggorockee.com",
-        "http://airbnb.ggorockee.com",
-    ]
+# # --- CSRF Settings ---
+# # CORS 설정과 마찬가지로, 환경에 따라 신뢰하는 출처를 분리하여 관리합니다.
+# if DEBUG:
+#     CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+# else:
+#     CSRF_TRUSTED_ORIGINS = [
+#         "http://airbnb-beta.ggorockee.com",
+#         "http://airbnb.ggorockee.com",
+#     ]
+
+
+# ## logging setting
+# # 🪵 로깅 설정
+# if DEBUG:
+#     # --- 개발용 로깅 설정 ---
+#     LOGGING = {
+#         "version": 1,
+#         "disable_existing_loggers": False,
+#         "formatters": {
+#             "verbose": {
+#                 "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s"
+#             },
+#         },
+#         "handlers": {
+#             "console": {
+#                 "level": "DEBUG", # 개발 시에는 모든 레벨의 로그를 확인
+#                 "class": "logging.StreamHandler",
+#                 "formatter": "verbose",
+#             },
+#         },
+#         "root": {
+#             "handlers": ["console"],
+#             "level": "DEBUG",
+#         },
+#     }
+# else:
+#     # --- 운영용 로깅 설정 ---
+#     LOGGING = {
+#         "version": 1,
+#         "disable_existing_loggers": False,
+#         "formatters": {
+#             "verbose": {
+#                 "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s (%(module)s:%(lineno)d)",
+#             },
+#             "simple": {
+#                 "format": "%(asctime)s [%(levelname)s] %(message)s",
+#             },
+#         },
+#         "handlers": {
+#             # WARNING, ERROR 레벨 로그를 파일에 기록
+#             "file_warning": {
+#                 "level": "WARNING",
+#                 "class": "logging.handlers.RotatingFileHandler",
+#                 "filename": BASE_DIR / "logs/app_warning.log",
+#                 "maxBytes": 1024 * 1024 * 5,  # 5 MB
+#                 "backupCount": 5,
+#                 "formatter": "verbose",
+#             },
+#             # Access Log를 별도 파일에 기록
+#             "file_access": {
+#                 "level": "INFO",
+#                 "class": "logging.handlers.RotatingFileHandler",
+#                 "filename": BASE_DIR / "logs/access.log",
+#                 "maxBytes": 1024 * 1024 * 5,  # 5 MB
+#                 "backupCount": 5,
+#                 "formatter": "simple", # Access Log는 간단한 포맷 사용
+#             },
+#             # ERROR 레벨 로그 발생 시 이메일 발송
+#             "mail_admins": {
+#                 "level": "ERROR",
+#                 "class": "django.utils.log.AdminEmailHandler",
+#                 "formatter": "verbose",
+#             }
+#         },
+#         "loggers": {
+#             # Django 기본 로거
+#             "django": {
+#                 "handlers": ["file_warning"],
+#                 "level": "INFO",
+#                 "propagate": True,
+#             },
+#             # 500 에러 등 요청 처리 실패 로거
+#             "django.request": {
+#                 "handlers": ["mail_admins", "file_warning"],
+#                 "level": "ERROR",
+#                 "propagate": False,
+#             },
+#             # Access Log를 위한 커스텀 로거
+#             "access": {
+#                 "handlers": ["file_access"],
+#                 "level": "INFO",
+#                 "propagate": False,
+#             },
+#         },
+#         # 위에 명시되지 않은 모든 로거들의 기본 설정
+#         "root": {
+#             "handlers": ["file_warning"],
+#             "level": "WARNING",
+#         },
+#     }

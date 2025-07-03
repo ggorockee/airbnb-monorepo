@@ -1,70 +1,97 @@
-from rest_framework import status  # Import status for explicit status codes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.status import HTTP_200_OK
+from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rooms.models import Room
 from .models import Wishlist
 from .serializers import WishlistSerializer
 
 
 class Wishlists(APIView):
-    """
-    API View to handle the collection of wishlists for the authenticated user.
-    - GET: Retrieves all wishlists belonging to the user.
-    - POST: Creates a new wishlist for the user.
-    """
 
-    # Ensures that only authenticated (logged-in) users can access this view.
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """
-        Handles GET requests to retrieve all wishlists for the currently logged-in user.
-        """
-        # Filter the Wishlist objects to get only those that belong to the requesting user.
-        # This is a crucial step to ensure users can only see their own data.
         all_wishlists = Wishlist.objects.filter(user=request.user)
-
-        # Serialize the queryset of wishlists.
-        # - `many=True` is required because we are serializing a list of objects, not a single instance.
-        # - `context={"request": request}` is passed to the serializer, which is often necessary
-        #   for hyperlinked fields (e.g., to generate full URLs for related resources).
         serializer = WishlistSerializer(
             all_wishlists,
             many=True,
             context={"request": request},
         )
-
-        # Return the serialized data with a 200 OK status, indicating a successful request.
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data)
 
     def post(self, request):
-        """
-        Handles POST requests to create a new wishlist for the currently logged-in user.
-        """
-        # Instantiate the serializer with the data sent in the request body.
         serializer = WishlistSerializer(data=request.data)
-
-        # Validate the incoming data against the serializer's rules.
         if serializer.is_valid():
-            # If validation is successful, save the new object to the database.
-            # We explicitly pass the `user` from the request object to the `save()` method.
-            # This ensures the new wishlist is correctly associated with the authenticated user,
-            # preventing users from creating wishlists for others.
-            wishlist = serializer.save(user=request.user)
-
-            # To provide a complete representation of the newly created object,
-            # we re-serialize the `wishlist` instance.
-            response_serializer = WishlistSerializer(
-                wishlist,
-                context={
-                    "request": request
-                },  # Pass context here as well for consistency
+            wishlist = serializer.save(
+                user=request.user,
             )
-
-            # Return the data of the newly created wishlist with a 201 Created status.
-            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+            serializer = WishlistSerializer(wishlist)
+            return Response(serializer.data)
         else:
-            # If validation fails, return the error details provided by the serializer.
-            # A 400 Bad Request status code indicates that the client's request was malformed.
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors)
+
+
+class WishlistDetail(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk, user):
+        try:
+            return Wishlist.objects.get(pk=pk, user=user)
+        except Wishlist.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        wishlist = self.get_object(pk, request.user)
+        serializer = WishlistSerializer(
+            wishlist,
+            context={"request": request},
+        )
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        wishlist = self.get_object(pk, request.user)
+        wishlist.delete()
+        return Response(status=HTTP_200_OK)
+
+    def put(self, request, pk):
+        wishlist = self.get_object(pk, request.user)
+        serializer = WishlistSerializer(
+            wishlist,
+            data=request.data,
+            partial=True,
+        )
+        if serializer.is_valid():
+            wishlist = serializer.save()
+            serializer = WishlistSerializer(
+                wishlist,
+                context={"request": request},
+            )
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+
+
+class WishlistToggle(APIView):
+    def get_list(self, pk, user):
+        try:
+            return Wishlist.objects.get(pk=pk, user=user)
+        except Wishlist.DoesNotExist:
+            raise NotFound
+
+    def get_room(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def put(self, request, pk, room_pk):
+        wishlist = self.get_list(pk, request.user)
+        room = self.get_room(room_pk)
+        if wishlist.rooms.filter(pk=room.pk).exists():
+            wishlist.rooms.remove(room)
+        else:
+            wishlist.rooms.add(room)
+        return Response(status=HTTP_200_OK)

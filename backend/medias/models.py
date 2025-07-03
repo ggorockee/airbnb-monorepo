@@ -1,15 +1,13 @@
 from django.db import models
-
 from common.models import CommonModel
 
 
 class Photo(CommonModel):
-    file = models.CharField(max_length=150)
 
+    file = models.URLField()
     description = models.CharField(
         max_length=140,
     )
-
     room = models.ForeignKey(
         "rooms.Room",
         on_delete=models.CASCADE,
@@ -17,7 +15,6 @@ class Photo(CommonModel):
         blank=True,
         related_name="photos",
     )
-
     experience = models.ForeignKey(
         "experiences.Experience",
         on_delete=models.CASCADE,
@@ -32,8 +29,7 @@ class Photo(CommonModel):
 
 class Video(CommonModel):
 
-    file = models.CharField(max_length=180)
-
+    file = models.URLField()
     experience = models.OneToOneField(
         "experiences.Experience",
         on_delete=models.CASCADE,

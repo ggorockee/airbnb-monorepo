@@ -1,7 +1,6 @@
-from django.conf import settings
 from django.db import models
-
 from common.models import CommonModel
+from django.conf import settings
 
 
 class ChattingRoom(CommonModel):
@@ -20,7 +19,6 @@ class Message(CommonModel):
     """Message Model Definition"""
 
     text = models.TextField()
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -28,7 +26,6 @@ class Message(CommonModel):
         on_delete=models.SET_NULL,
         related_name="messages",
     )
-
     room = models.ForeignKey(
         "direct_messages.ChattingRoom",
         on_delete=models.CASCADE,

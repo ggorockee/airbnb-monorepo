@@ -1,25 +1,26 @@
 from django.contrib import admin
-
 from .models import Review
 
 
 class WordFilter(admin.SimpleListFilter):
+
     title = "Filter by words!"
+
     parameter_name = "word"
 
     def lookups(self, request, model_admin):
         return [
             ("good", "Good"),
             ("great", "Great"),
-            ("awesome", "AweSome"),
+            ("awesome", "Awesome"),
         ]
 
-    def queryset(self, request, queryset):
+    def queryset(self, request, reviews):
         word = self.value()
         if word:
-            return queryset.filter(payload__contains=word)
+            return reviews.filter(payload__contains=word)
         else:
-            queryset
+            reviews
 
 
 @admin.register(Review)
@@ -29,7 +30,6 @@ class ReviewAdmin(admin.ModelAdmin):
         "__str__",
         "payload",
     )
-
     list_filter = (
         WordFilter,
         "rating",
