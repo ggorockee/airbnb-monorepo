@@ -8,7 +8,7 @@ import environ
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
-    DJANGO_ALLOWED_HOSTS=(list, [])
+    DJANGO_ALLOWED_HOSTS=(str, "")
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,6 +28,7 @@ DEBUG = env('DEBUG')
 
 print("DEBUG:", DEBUG)
 ALLOWED_HOSTS_STRING = env("DJANGO_ALLOWED_HOSTS")
+print(f"ALLOWED_HOSTS_STRING: ===> {ALLOWED_HOSTS_STRING}")
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
