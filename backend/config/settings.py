@@ -32,6 +32,7 @@ if DEBUG:
     ALLOWED_HOSTS = []
 else:
     ALLOWED_HOSTS = ALLOWED_HOSTS_STRING.split(",")
+print(f"ALLOWED_HOSTS: ==> {ALLOWED_HOSTS}")
 
 
 # Application definition
