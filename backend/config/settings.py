@@ -26,7 +26,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-
+print("DEBUG:", DEBUG)
 ALLOWED_HOSTS_STRING = env("DJANGO_ALLOWED_HOSTS")
 if DEBUG:
     ALLOWED_HOSTS = []

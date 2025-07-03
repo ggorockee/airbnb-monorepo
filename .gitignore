@@ -409,3 +409,5 @@ text
 backend/database
 frontend/.vscode
 *.tgz
+
+infra
