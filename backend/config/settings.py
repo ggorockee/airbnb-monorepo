@@ -1,32 +1,33 @@
 from pathlib import Path
 from datetime import timedelta
-from dotenv import load_dotenv
 import os
+import environ
 
-load_dotenv()
 
 
-# env = environ.Env(
-#     DEBUG=(bool, False),
-# )
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False),
+    DJANGO_ALLOWED_HOSTS=(list, [])
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "off").lower() in ("true", "on", "1", "yes")
+DEBUG = env('DEBUG')
 
 
-ALLOWED_HOSTS_STRING = os.getenv("DJANGO_ALLOWED_HOSTS")
+ALLOWED_HOSTS_STRING = env("DJANGO_ALLOWED_HOSTS")
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
@@ -51,15 +52,15 @@ THIRD_PART_APPS = [
 ]
 
 CUSTOM_APPS = [
-    "user.apps.UserConfig",
-    "room.apps.RoomConfig",
+    "users.apps.UsersConfig",
+    "rooms.apps.RoomsConfig",
     "common.apps.CommonConfig",
-    "experience.apps.ExperienceConfig",
-    "category.apps.CategoryConfig",
-    "review.apps.ReviewConfig",
-    "wishlist.apps.WishlistConfig",
-    "booking.apps.BookingConfig",
-    "media.apps.MediaConfig",
+    "experiences.apps.ExperiencesConfig",
+    "categories.apps.CategoriesConfig",
+    "reviews.apps.ReviewsConfig",
+    "wishlists.apps.WishlistsConfig",
+    "bookings.apps.BookingsConfig",
+    "medias.apps.MediasConfig",
     "direct_messages.apps.DirectMessagesConfig",
 ]
 
@@ -120,11 +121,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB"),
-        "USER": os.getenv("POSTGRES_USER"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("POSTGRES_HOST"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),  # 기본 포트 5432
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env("POSTGRES_PORT"),  # 기본 포트 5432
     }
 }
 
@@ -170,7 +171,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "user.User"
+AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
     # Set the default authentication class for all API views to JWTAuthentication.
@@ -226,7 +227,7 @@ SIMPLE_JWT = {
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
 }
 
-KAKAO_CLIENT_ID = os.getenv("KAKAO_CLIENT_ID")
+KAKAO_CLIENT_ID = env("KAKAO_CLIENT_ID")
 
 
 APPEND_SLASH = False
