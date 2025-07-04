@@ -74,7 +74,7 @@ jobs:
         run: |
           # 이전 Job에서 전달받은 이미지 태그를 변수로 사용
           TAG=${{ needs.build-and-push-image.outputs.image_tag }}
-          FILE_PATH="charts/argocd/applicationsets/dev/valuefiles/airbnb-umbrella/values.yaml"
+          FILE_PATH="charts/argocd/applicationsets/valuefiles/prod/airbnb-umbrella/values.yaml"
           
           # yq를 사용하여 frontend.image.tag 값을 새로운 태그로 변경
           yq eval '.frontend.image.tag = "'$TAG'"' -i $FILE_PATH
